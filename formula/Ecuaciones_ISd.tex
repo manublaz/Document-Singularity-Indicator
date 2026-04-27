@@ -1,0 +1,115 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath, amssymb, amsfonts}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{lmodern}
+
+\title{Ecuaciones del Indicador IS$_d$\\
+\large Indicador de Singularidad Documental}
+\author{Blázquez Ochando, M. · Ovalle Perandones, M.A. · Prieto Gutiérrez, J.J.\\
+Universidad Complutense de Madrid}
+\date{2025}
+
+\begin{document}
+\maketitle
+
+% ────────────────────────────────────────────────────────────────
+\section*{Ecuación (1) — Estructura general del indicador}
+% ────────────────────────────────────────────────────────────────
+
+\begin{equation}
+IS_d \;=\; \alpha \cdot O_d \;+\; (1-\alpha) \cdot I_d
+\qquad \alpha \in [0,1]
+\label{eq:isd}
+\end{equation}
+
+\noindent
+Donde $O_d$ es el componente de originalidad textual, $I_d$ el componente de
+impacto bibliométrico y $\alpha$ el parámetro de ponderación.
+
+% ────────────────────────────────────────────────────────────────
+\section*{Ecuación (2) — Normalización de $O_d$}
+% ────────────────────────────────────────────────────────────────
+
+\begin{equation}
+O_d \;=\; \min\!\left(\frac{O_d^{raw}}{P_{99}(O^{raw})},\; 1\right)
+\label{eq:od}
+\end{equation}
+
+\noindent
+Donde $P_{99}(O^{raw})$ es el percentil 99 de los valores $O_d^{raw}$ en el corpus.
+
+% ────────────────────────────────────────────────────────────────
+\section*{Ecuación (3) — Originalidad textual bruta $O_d^{raw}$}
+% ────────────────────────────────────────────────────────────────
+
+\begin{equation}
+O_d^{raw} \;=\;
+\frac{\displaystyle\sum_{i \,\in\, \Omega_d} S_i \cdot \log\!\left(1 + f_i^{\,doc}\right)}
+     {\;\left|\Omega_d\right| \cdot \log\!\!\left(1 + \dfrac{T_d}{\left|\Omega_d\right|}\right) + \varepsilon\;}
+\label{eq:odraw}
+\end{equation}
+
+\noindent
+Donde:
+\begin{itemize}
+  \item $\Omega_d$ = conjunto de n-gramas únicos presentes en el documento $d$
+  \item $|\Omega_d|$ = número de n-gramas únicos (cardinal del conjunto)
+  \item $f_i^{\,doc}$ = frecuencia absoluta del n-grama $i$ en el documento $d$
+  \item $T_d$ = total de n-gramas extraídos del documento $d$ (con repetición)
+  \item $\varepsilon = 10^{-6}$ = constante de suavizado numérico
+\end{itemize}
+
+% ────────────────────────────────────────────────────────────────
+\section*{Ecuación (4) — Peso de singularidad $S_i$}
+% ────────────────────────────────────────────────────────────────
+
+\begin{equation}
+S_i \;=\;
+\underbrace{\log\!\left(\frac{C+1}{cd_i + 0{,}5}\right)}_{\text{IDF de Robertson}}
+\;\cdot\;
+\underbrace{\frac{1}{1 + \log\!\left(1 + f_i^{\,corpus}\right)}}_{\text{penalización de frecuencia (BM25)}}
+\label{eq:si}
+\end{equation}
+
+\noindent
+Donde:
+\begin{itemize}
+  \item $C$ = número total de documentos en el corpus
+  \item $cd_i$ = número de documentos del corpus que contienen el n-grama $i$
+  \item $f_i^{\,corpus}$ = frecuencia total del n-grama $i$ en todo el corpus
+\end{itemize}
+
+% ────────────────────────────────────────────────────────────────
+\section*{Ecuación (5) — Impacto bibliométrico normalizado $I_d$}
+% ────────────────────────────────────────────────────────────────
+
+\begin{equation}
+I_d \;=\; \frac{\log(1 + C_d)}{\log(1 + C_{max})}
+\label{eq:id}
+\end{equation}
+
+\noindent
+Donde $C_d$ es el número de citas recibidas por el documento $d$ y
+$C_{max}$ es el máximo de citas en el corpus ($C_{max} = 53{.}982$ en calcia.db).
+Se verifica que $I_d \in [0,1]$ exactamente: $I_d = 0$ si $C_d = 0$; $I_d = 1$
+si $C_d = C_{max}$.
+
+% ────────────────────────────────────────────────────────────────
+\section*{Ecuación ($\alpha^*$) — Criterio objetivo de calibración}
+% ────────────────────────────────────────────────────────────────
+
+\begin{equation}
+\alpha^* \;=\; \arg\min_{\alpha \,\in\, [0,1]}
+\left|\,\mathrm{skew}\!\left(\alpha \cdot O_d + (1-\alpha)\cdot I_d\right)\right|
+\label{eq:alpha}
+\end{equation}
+
+\noindent
+Sobre calcia.db: $\alpha^* = 0{,}692 \approx 0{,}70$, con $|\mathrm{skew}| = 0{,}00058$
+(mínimo global). La T de Kendall de los deciles permanece igual a 1,0 para
+todo $\alpha \in [0;\, 0{,}90]$.
+
+\end{document}
