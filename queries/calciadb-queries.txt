@@ -1,0 +1,33 @@
+Specific searches were conducted in the PubMed database (https://pubmed.ncbi.nlm.nih.gov/) for various medical fields aiming to identify scientific articles and access whenever possible their PDF versions through full-text links available on the platform retrieving up to the first 250 results from the list for each field. The search areas were: 
+
+- Cardiology
+- Oncology
+- Neurology
+- Endocrinology
+- Infectious Diseases
+- Pediatrics
+- Gynecology and Obstetrics
+- General Surgery
+- Psychiatry
+- Internal Medicine
+- Dermatology
+- Ophthalmology
+- Otorhinolaryngology
+- Nephrology
+- Rheumatology
+- Preventive Medicine
+- Occupational Medicine
+- Toxicology
+- Pharmacology
+- Radiology
+- Diagnostic Imaging
+- Anesthesiology
+- Pathology
+- Emergency Medicine
+- Intensive Care Medicine
+- Medical Genetics
+- Epidemiology
+- Bioethics
+- Alternative Medicine
+- Public Health
+- Rehabilitation Medicine
