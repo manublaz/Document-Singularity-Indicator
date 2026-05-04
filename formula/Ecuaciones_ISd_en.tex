@@ -1,0 +1,117 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath, amssymb, amsfonts}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{lmodern}
+
+\title{Equations of the IS$_d$ Indicator\\
+\large Document Singularity Indicator}
+\author{Blázquez Ochando, M. · Ovalle Perandones, M.A. · Prieto Gutiérrez, J.J.\\
+Universidad Complutense de Madrid}
+\date{2025}
+
+\begin{document}
+\maketitle
+
+% ────────────────────────────────────────────────────────────────
+\section*{Equation (1) — General structure of the indicator}
+% ────────────────────────────────────────────────────────────────
+
+\begin{equation}
+IS_d \;=\; \alpha \cdot O_d \;+\; (1-\alpha) \cdot I_d
+\qquad \alpha \in [0,1]
+\label{eq:isd}
+\end{equation}
+
+\noindent
+Where $O_d$ is the textual originality component, $I_d$ the bibliometric
+impact component, and $\alpha$ the weighting parameter.
+
+% ────────────────────────────────────────────────────────────────
+\section*{Equation (2) — Normalisation of $O_d$}
+% ────────────────────────────────────────────────────────────────
+
+\begin{equation}
+O_d \;=\; \min\!\left(\frac{O_d^{raw}}{P_{99}(O^{raw})},\; 1\right)
+\label{eq:od}
+\end{equation}
+
+\noindent
+Where $P_{99}(O^{raw})$ is the 99th percentile of the $O_d^{raw}$ values
+in the corpus.
+
+% ────────────────────────────────────────────────────────────────
+\section*{Equation (3) — Raw textual originality $O_d^{raw}$}
+% ────────────────────────────────────────────────────────────────
+
+\begin{equation}
+O_d^{raw} \;=\;
+\frac{\displaystyle\sum_{i \,\in\, \Omega_d} S_i \cdot \log\!\left(1 + f_i^{\,doc}\right)}
+     {\;\left|\Omega_d\right| \cdot \log\!\!\left(1 + \dfrac{T_d}{\left|\Omega_d\right|}\right) + \varepsilon\;}
+\label{eq:odraw}
+\end{equation}
+
+\noindent
+Where:
+\begin{itemize}
+  \item $\Omega_d$ = set of unique n-grams present in document $d$
+  \item $|\Omega_d|$ = number of unique n-grams (cardinality of the set)
+  \item $f_i^{\,doc}$ = absolute frequency of n-gram $i$ in document $d$
+  \item $T_d$ = total number of n-grams extracted from document $d$ (with repetition)
+  \item $\varepsilon = 10^{-6}$ = numerical smoothing constant
+\end{itemize}
+
+% ────────────────────────────────────────────────────────────────
+\section*{Equation (4) — Singularity weight $S_i$}
+% ────────────────────────────────────────────────────────────────
+
+\begin{equation}
+S_i \;=\;
+\underbrace{\log\!\left(\frac{C+1}{cd_i + 0{.}5}\right)}_{\text{Robertson IDF}}
+\;\cdot\;
+\underbrace{\frac{1}{1 + \log\!\left(1 + f_i^{\,corpus}\right)}}_{\text{frequency penalty (BM25)}}
+\label{eq:si}
+\end{equation}
+
+\noindent
+Where:
+\begin{itemize}
+  \item $C$ = total number of documents in the corpus
+  \item $cd_i$ = number of corpus documents containing n-gram $i$
+  \item $f_i^{\,corpus}$ = total frequency of n-gram $i$ across the entire corpus
+\end{itemize}
+
+% ────────────────────────────────────────────────────────────────
+\section*{Equation (5) — Normalised bibliometric impact $I_d$}
+% ────────────────────────────────────────────────────────────────
+
+\begin{equation}
+I_d \;=\; \frac{\log(1 + C_d)}{\log(1 + C_{max})}
+\label{eq:id}
+\end{equation}
+
+\noindent
+Where $C_d$ is the number of citations received by document $d$ and
+$C_{max}$ is the maximum number of citations in the corpus
+($C_{max} = 53{,}982$ in calcia.db).
+It holds that $I_d \in [0,1]$ exactly: $I_d = 0$ if $C_d = 0$;
+$I_d = 1$ if $C_d = C_{max}$.
+
+% ────────────────────────────────────────────────────────────────
+\section*{Equation ($\alpha^*$) — Objective calibration criterion}
+% ────────────────────────────────────────────────────────────────
+
+\begin{equation}
+\alpha^* \;=\; \arg\min_{\alpha \,\in\, [0,1]}
+\left|\,\mathrm{skew}\!\left(\alpha \cdot O_d + (1-\alpha)\cdot I_d\right)\right|
+\label{eq:alpha}
+\end{equation}
+
+\noindent
+On calcia.db: $\alpha^* = 0{.}692 \approx 0{.}70$, with $|\mathrm{skew}| = 0{.}00058$
+(global minimum). Kendall's $\tau$ of the deciles remains equal to 1.0 for
+all $\alpha \in [0;\, 0{.}90]$.
+
+\end{document}
