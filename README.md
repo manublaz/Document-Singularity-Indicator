@@ -1,4 +1,4 @@
-# Calcia -- Documentary Singularity Indicator (SId)
+# Documentary Singularity Indicator (SId)
 
 ## Overview
 
@@ -46,20 +46,6 @@ The revised formulation eliminates the restrictive nearest-neighbor filter, so a
 
 ```
 singularitycalcia_v2.py          Main script: SId v2 analysis pipeline
-singularitycalcia_v1.py          Original SId v1 implementation (reference)
-singularitycalciaPARALLEL.py     Parallelized variant for large corpora
-createCalciaDB.py                Utilities to create and populate calcia.db
-pubmedcalcia.py                  PubMed document retrieval and ingestion
-scholarcalcia.py                 Google Scholar document retrieval and ingestion
-singularityEVAL_MASTER.py        Master evaluation script
-singularityEVAL1.py              Evaluation module 1
-singularityEVAL2.py              Evaluation module 2
-singularityEVAL3.py              Evaluation module 3
-singularityEVAL4.py              Evaluation module 4
-singularityEVAL5.py              Evaluation module 5
-singularityEVAL6.py              Evaluation module 6
-singularityEVAL7.py              Evaluation module 7
-fix.py                           Data repair utilities
 requeriments.txt                 Python dependencies
 README.md                        This file
 ```
@@ -203,8 +189,6 @@ The `alpha` sensitivity analysis (Figure 7) should be consulted before applying 
 - Prof. Maria Antonia Ovalle Perandones (maovalle@ucm.es)
 
 Department of Library and Information Science, Complutense University of Madrid (UCM).
-
-Formula analysis and improvement: Claude Sonnet (Anthropic), 2025.
 
 ---
 
