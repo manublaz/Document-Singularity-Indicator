@@ -195,6 +195,7 @@ Department of Library and Information Science, Complutense University of Madrid 
 ## Citation
 
 If you use this software in academic research, please cite the corresponding publication (in preparation). Until formal publication, reference this repository directly.
+> Blázquez-Ochando, M.; Ovalle-Perandones, M.A.; Prieto-Gutiérrez, J.J. (2026). *Documentary Singularity Indicator* [Software] | [Formula]. GitHub. [https://github.com/manublaz/Document-Singularity-Indicator](https://github.com/manublaz/Document-Singularity-Indicator)
 
 ---
 
