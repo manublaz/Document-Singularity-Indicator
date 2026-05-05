@@ -45,29 +45,95 @@ The revised formulation eliminates the restrictive nearest-neighbor filter, so a
 ## Repository Structure
 
 ```
-singularitycalcia_v2.py          Main script: SId v2 analysis pipeline
-requeriments.txt                 Python dependencies
-README.md                        This file
+Document-Singularity-Indicator/
+│
+├── database/                          Calcia corpus database (split SQL dumps)
+│   ├── calcia_part_001.sql
+│   ├── calcia_part_002.sql
+│   └── ... (65 files total)
+│
+├── datasets/                          CSV output tables from the SId analysis
+│   ├── calcia_bottom50.csv            Bottom 50 documents by SId v2
+│   ├── calcia_correlaciones.csv       Pearson correlations with corpus variables
+│   ├── calcia_deciles.csv             Summary statistics by SId v2 decile
+│   ├── calcia_singularity_results.csv Full results for all documents
+│   ├── calcia_stats_comparison.csv    Descriptive statistics: SId v1 vs SId v2
+│   ├── calcia_top50.csv               Top 50 documents by SId v2
+│   └── generate_figures_en.py         Script to regenerate figures from CSV data
+│
+├── figures/                           Analysis figures (Spanish and English versions)
+│   ├── figura_1.png                   Score distribution (Spanish)
+│   ├── figura_1_en.png                Score distribution (English)
+│   ├── figura_2.png                   Pearson correlations (Spanish)
+│   ├── figura_2_en.png                Pearson correlations (English)
+│   ├── figura_3.png                   SId vs bibliometric impact (Spanish)
+│   ├── figura_3_en.png                SId vs bibliometric impact (English)
+│   ├── figura_4.png                   Score distribution by citation quartile (Spanish)
+│   ├── figura_4_en.png                Score distribution by citation quartile (English)
+│   ├── figura_5.png                   O_d and I_d decomposition (Spanish)
+│   ├── figura_5_en.png                O_d and I_d decomposition (English)
+│   ├── figura_6.png                   Alpha sensitivity analysis (Spanish)
+│   ├── figura_6_en.png                Alpha sensitivity analysis (English)
+│   ├── figura_7.png                   Feature profile by decile (Spanish)
+│   ├── figura_7_en.png                Feature profile by decile (English)
+│   ├── figura_8.png                   Top/Bottom 20 ranking (Spanish)
+│   ├── figura_8_en.png                Top/Bottom 20 ranking (English)
+│   ├── figura_9.png                   Synthetic corpus validation (Spanish)
+│   └── figura_9_en.png                Synthetic corpus validation (English)
+│
+├── formula/                           Formal mathematical specification of SId
+│   ├── Ecuaciones_ISd.pdf             Formula document (Spanish)
+│   ├── Ecuaciones_ISd.tex             LaTeX source (Spanish)
+│   ├── Ecuaciones_ISd_en.pdf          Formula document (English)
+│   └── Ecuaciones_ISd_en.tex          LaTeX source (English)
+│
+├── queries/                           PubMed search queries used to build the corpus
+│   └── calciadb-queries.txt
+│
+├── reports/                           Full analysis report
+│   └── singularity_report.txt
+│
+├── calciaDB_install.py                Assembles calcia.db from the SQL dump files
+├── calciaDB_pubmed_scraping.py        Retrieves and ingests documents from PubMed
+├── requirements.txt                   Python dependencies
+├── singularitycalcia_v2.py            Main analysis pipeline (Spanish output)
+└── singularitycalcia_v2_en.py         Main analysis pipeline (English output)
 ```
 
 ---
 
-## Database Schema
+## Database
 
-The main input is a SQLite database (`calcia.db`) with a `corpus` table structured as follows:
+The corpus database (`calcia.db`) is distributed as 65 split SQL dump files located in the `database/` folder. To reassemble and import it locally, run the provided installation script:
 
-| Column         | Type    | Description                                  |
-|---------------|---------|----------------------------------------------|
-| id            | INTEGER | Primary key                                  |
-| url           | TEXT    | Source URL                                   |
-| title         | TEXT    | Document title                               |
-| author        | TEXT    | Author(s)                                    |
-| datepub       | TEXT    | Publication date                             |
-| text          | TEXT    | Preprocessed full text                       |
-| textoriginal  | TEXT    | Original full text (preferred if available)  |
-| citations     | INTEGER | Citation count                               |
-| created_at    | TEXT    | Ingestion timestamp                          |
-| updated_at    | TEXT    | Last update timestamp                        |
+```bash
+python calciaDB_install.py
+```
+
+This script concatenates the partial SQL files in order and restores the full SQLite database ready for analysis.
+
+### Schema
+
+The main `corpus` table is structured as follows:
+
+| Column       | Type    | Description                                 |
+|--------------|---------|---------------------------------------------|
+| id           | INTEGER | Primary key                                 |
+| url          | TEXT    | Source URL                                  |
+| title        | TEXT    | Document title                              |
+| author       | TEXT    | Author(s)                                   |
+| datepub      | TEXT    | Publication date                            |
+| text         | TEXT    | Preprocessed full text                      |
+| textoriginal | TEXT    | Original full text (preferred if available) |
+| citations    | INTEGER | Citation count                              |
+| created_at   | TEXT    | Ingestion timestamp                         |
+| updated_at   | TEXT    | Last update timestamp                       |
+
+---
+
+## Corpus Construction
+
+Documents were retrieved from PubMed using the search queries listed in `queries/calciadb-queries.txt`. The retrieval and ingestion pipeline is implemented in `calciaDB_pubmed_scraping.py`, which handles API calls, metadata extraction, full-text preprocessing, and citation count ingestion.
 
 ---
 
@@ -76,7 +142,7 @@ The main input is a SQLite database (`calcia.db`) with a `corpus` table structur
 Python 3.9 or later is required.
 
 ```bash
-pip install -r requeriments.txt
+pip install -r requirements.txt
 ```
 
 Core dependencies: `numpy`, `pandas`, `matplotlib`, `scipy`.
@@ -88,82 +154,93 @@ Core dependencies: `numpy`, `pandas`, `matplotlib`, `scipy`.
 ### Analyze a corpus database
 
 ```bash
-python singularitycalcia_v2.py --db calcia.db
+python singularitycalcia_v2_en.py --db calcia.db
 ```
 
 ### Analyze with custom parameters
 
 ```bash
-python singularitycalcia_v2.py --db calcia.db --alpha 0.7 --ngram 3 --output ./results
+python singularitycalcia_v2_en.py --db calcia.db --alpha 0.7 --ngram 3 --output ./results
 ```
 
 ### Re-analyze from a previous v1 CSV result
 
 ```bash
-python singularitycalcia_v2.py --csv results_v1.csv
+python singularitycalcia_v2_en.py --csv results_v1.csv
 ```
 
 ### Run only the synthetic corpus validation
 
 ```bash
-python singularitycalcia_v2.py --synthetic
+python singularitycalcia_v2_en.py --synthetic
+```
+
+### Regenerate figures from existing CSV outputs
+
+```bash
+python datasets/generate_figures_en.py --data ./datasets --output ./figures
 ```
 
 ### Command-line arguments
 
-| Argument    | Default                  | Description                                      |
-|------------|--------------------------|--------------------------------------------------|
-| `--db`      | --                       | Path to calcia.db                                |
-| `--csv`     | --                       | Path to a previous v1 results CSV                |
-| `--synthetic` | False                  | Run only synthetic corpus validation             |
-| `--alpha`   | 0.7                      | Originality weight (range: 0.0 to 1.0)           |
-| `--ngram`   | 3                        | N-gram size for lexical analysis                 |
-| `--limit`   | None                     | Limit number of documents (for quick tests)      |
-| `--output`  | ./resultados_SId_v2      | Output directory                                 |
+| Argument      | Default             | Description                                 |
+|---------------|---------------------|---------------------------------------------|
+| `--db`        | --                  | Path to calcia.db                           |
+| `--csv`       | --                  | Path to a previous v1 results CSV           |
+| `--synthetic` | False               | Run only synthetic corpus validation        |
+| `--alpha`     | 0.7                 | Originality weight (range: 0.0 to 1.0)      |
+| `--ngram`     | 3                   | N-gram size for lexical analysis            |
+| `--limit`     | None                | Limit number of documents (for quick tests) |
+| `--output`    | ./resultados_SId_v2 | Output directory                            |
 
 ---
 
 ## Output Files
 
-All outputs are written to the directory specified by `--output`.
+All outputs are written to the directory specified by `--output`. Pre-computed outputs for the full calcia.db corpus are available in the `datasets/` and `figures/` folders.
 
 ### CSV tables
 
-| File                            | Description                                           |
-|--------------------------------|-------------------------------------------------------|
-| `calcia_singularity_results.csv` | Full results for all documents (all columns)        |
-| `calcia_top50.csv`              | Top 50 documents by SId v2                           |
-| `calcia_bottom50.csv`           | Bottom 50 documents by SId v2 (excluding score = 0) |
-| `calcia_deciles.csv`            | Summary statistics by SId v2 decile                 |
-| `calcia_stats_comparison.csv`   | Descriptive statistics: SId v1 vs SId v2            |
-| `calcia_correlaciones.csv`      | Pearson correlations with external variables         |
+| File                             | Description                                          |
+|----------------------------------|------------------------------------------------------|
+| `calcia_singularity_results.csv` | Full results for all documents (all columns)         |
+| `calcia_top50.csv`               | Top 50 documents by SId v2                           |
+| `calcia_bottom50.csv`            | Bottom 50 documents by SId v2 (excluding score = 0) |
+| `calcia_deciles.csv`             | Summary statistics by SId v2 decile                  |
+| `calcia_stats_comparison.csv`    | Descriptive statistics: SId v1 vs SId v2             |
+| `calcia_correlaciones.csv`       | Pearson correlations with external variables         |
 
 ### Figures
 
-| File                           | Description                                              |
-|-------------------------------|----------------------------------------------------------|
-| `fig1_distribucion.png`        | Score distribution histograms: SId v1 vs SId v2         |
-| `fig2_ceros.png`               | Key discriminatory quality metrics: SId v1 vs SId v2    |
-| `fig3_correlaciones.png`       | Pearson correlations: SId v1 and SId v2 vs corpus vars  |
-| `fig4_scatter_citas.png`       | SId v2 vs bibliometric impact (scatter and boxplot)     |
-| `fig5_boxplot_cuartiles.png`   | Score distribution by citation quartile                  |
-| `fig6_componentes.png`         | O_d and I_d component decomposition                     |
-| `fig7_alpha_sensibilidad.png`  | Sensitivity analysis of the alpha parameter             |
-| `fig8_top_bottom.png`          | Top and bottom ranked documents by SId v2               |
-| `fig9_deciles_perfil.png`      | Feature profile by SId v2 decile                        |
-| `fig10_validacion_sintetica.png` | Synthetic corpus validation (known ground truth)      |
+Each figure is produced in both Spanish (`figura_N.png`) and English (`figura_N_en.png`) and stored in the `figures/` folder.
+
+| Figure | Description                                                       |
+|--------|-------------------------------------------------------------------|
+| 1      | SId score distribution (histogram and normal fit)                 |
+| 2      | Pearson correlations of SId with corpus variables                 |
+| 3      | Relationship between SId and bibliometric impact                  |
+| 4      | SId score distribution stratified by citation quartile            |
+| 5      | Decomposition of SId into O_d (originality) and I_d (impact)     |
+| 6      | Sensitivity analysis of SId to the alpha parameter               |
+| 7      | Feature profile by SId decile                                     |
+| 8      | Ranking of the 20 documents with highest and lowest SId           |
+| 9      | Validation on the synthetic corpus (known ground truth)           |
 
 ### Report
 
-| File                     | Description                                         |
-|-------------------------|-----------------------------------------------------|
-| `singularity_report.txt` | Full analysis report with statistics, correlations, and rankings |
+The full analysis report is available at `reports/singularity_report.txt`. It includes descriptive statistics, Pearson correlations, a decile profile table, and the top and bottom 25 document rankings.
+
+---
+
+## Formal Specification
+
+The mathematical formulation of the SId indicator is available in the `formula/` folder in both Spanish and English, as PDF and LaTeX source files. These documents include the complete derivation of the O_d and I_d components, the normalization procedure, and the rationale for the default parameter values.
 
 ---
 
 ## Synthetic Corpus Validation
 
-The script includes an internal validation procedure based on a manually constructed corpus of 12 documents organized into four categories with known ground-truth ordering:
+The pipeline includes an internal validation procedure based on a manually constructed corpus of 12 documents organized into four categories with known ground-truth ordering:
 
 - **Category A:** Highly cited, technically dense foundational papers (BERT, ResNet, Transformer).
 - **Category B:** Medium-impact specialized studies in bibliometrics, cardiology, and document science.
@@ -178,7 +255,7 @@ Expected behavior: SId v2 should assign the highest scores to Category A, interm
 
 The default configuration (`alpha=0.7`, `ngram=3`) is recommended for scientific corpora in English or Spanish with full-text documents of at least 200 words. For short abstracts or highly technical corpora with limited citation metadata, consider reducing `alpha` to increase the weight of the impact component.
 
-The `alpha` sensitivity analysis (Figure 7) should be consulted before applying SId to a new corpus, as the optimal balance between originality and impact varies by domain and document type.
+The alpha sensitivity analysis (Figure 6) should be consulted before applying SId to a new corpus, as the optimal balance between originality and impact varies by domain and document type.
 
 ---
 
@@ -194,11 +271,12 @@ Department of Library and Information Science, Complutense University of Madrid 
 
 ## Citation
 
-If you use this software in academic research, please cite the corresponding publication (in preparation). Until formal publication, reference this repository directly.
-> Blázquez-Ochando, M.; Ovalle-Perandones, M.A.; Prieto-Gutiérrez, J.J. (2026). *Documentary Singularity Indicator* [Software] | [Formula]. GitHub. [https://github.com/manublaz/Document-Singularity-Indicator](https://github.com/manublaz/Document-Singularity-Indicator)
+If you use this software, dataset, or formula in academic research, please cite as follows:
+
+> Blázquez-Ochando, M.; Ovalle-Perandones, M.A.; Prieto-Gutiérrez, J.J. (2026). *Documentary Singularity Indicator* [Software | Formula]. GitHub. https://github.com/manublaz/Document-Singularity-Indicator
 
 ---
 
 ## License
 
-This software is distributed for academic and research use. Contact the authors for other uses.
+This software and dataset are distributed for academic and research use. Contact the authors for other uses.
